@@ -16,7 +16,7 @@ This script implements the highly sought-after AOE Loot/Mass Loot feature from M
 - Place the script in your lua_scripts directory.
 - Apply the provided .diff script to add a few methods to Eluna for full compatibility:
   - To apply the `.diff` script:
-  - ```git apply azerothcore_eluna.diff``` or ```git apply trinitycore_eluna.diff```
+  - ```git apply --directory=modules/mod-eluna azerothcore_eluna.diff``` or ```git apply --directory=src/server/game/LuaEngine trinitycore_eluna.diff```
 - No further action is required; the script is fully functional once in place.
 
 ## 🎮 Usage
