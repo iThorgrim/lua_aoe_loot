@@ -1,0 +1,310 @@
+diff --git a/src/LuaEngine/CreatureMethods.h b/src/LuaEngine/CreatureMethods.h
+index f616399..fa8c9d0 100644
+--- a/src/LuaEngine/CreatureMethods.h
++++ b/src/LuaEngine/CreatureMethods.h
+@@ -1017,7 +1017,7 @@ auto const& threatlist = creature->GetThreatMgr().GetThreatList();
+         creature->SetUInt32Value(UNIT_NPC_FLAGS, flags);
+         return 0;
+     }
+-    
++
+     /**
+      * Sets the [Creature]'s Unit flags to `flags`.
+      *
+@@ -1538,5 +1538,11 @@ auto const& threatlist = creature->GetThreatMgr().GetThreatList();
+ #endif
+         return 1;
+     }
++
++    int GetLoot(lua_State* L, Creature* creature)
++    {
++        Eluna::Push(L, &creature->loot);
++        return 1;
++    }
+ };
+ #endif
+diff --git a/src/LuaEngine/LootMethods.h b/src/LuaEngine/LootMethods.h
+new file mode 100644
+index 0000000..15543d6
+--- /dev/null
++++ b/src/LuaEngine/LootMethods.h
+@@ -0,0 +1,211 @@
++/*
++* Copyright (C) 2010 - 2024 Eluna Lua Engine <http://emudevs.com/>
++* This program is free software licensed under GPL version 3
++* Please see the included DOCS/LICENSE.md for more information
++*/
++
++#ifndef LOOTMETHODS_H
++#define LOOTMETHODS_H
++
++/***
++ * Inherits all methods from: none
++ */
++namespace LuaLoot
++{
++    int IsLooted(lua_State* L, Loot* loot)
++    {
++        Eluna::Push(L, loot->isLooted());
++        return 1;
++    }
++
++    int AddItem(lua_State* L, Loot* loot)
++    {
++        uint32 itemid = Eluna::CHECKVAL<uint32>(L, 2);
++        uint8 min_count = Eluna::CHECKVAL<uint8>(L, 3);
++        uint8 max_count = Eluna::CHECKVAL<uint8>(L, 4);
++        float chance = Eluna::CHECKVAL<float>(L, 5);
++        uint16 loot_mode = Eluna::CHECKVAL<uint16>(L, 6);
++        bool needs_quest = Eluna::CHECKVAL<bool>(L, 7, false);
++
++        for (LootItem &lootitem : loot->items)
++        {
++            if (lootitem.itemid == itemid && lootitem.count < 255)
++            {
++                lootitem.count += min_count; // Todo: Update to get rand between min_count and max_count
++                return 0;
++            }
++        }
++
++        LootStoreItem newLootStoreItem(itemid, 0, chance, needs_quest, loot_mode, 0, min_count, max_count);
++        loot->AddItem(newLootStoreItem);
++
++        return 0;
++    }
++
++    int HasItem(lua_State* L, Loot* loot)
++    {
++        uint32 itemid = Eluna::CHECKVAL<uint32>(L, 2, false);
++        uint32 count = Eluna::CHECKVAL<uint32>(L, 3, false);
++        bool has_item = false;
++
++        if (itemid)
++        {
++            for (const LootItem &lootitem : loot->items)
++            {
++                if (lootitem.itemid == itemid && (count == 0 || lootitem.count == count))
++                {
++                    has_item = true;
++                    break;
++                }
++            }
++        }
++        else
++        {
++            for (const LootItem &lootitem : loot->items)
++            {
++                if (lootitem.itemid && lootitem.itemid != 0)
++                {
++                    has_item = true;
++                    break;
++                }
++            }
++        }
++        Eluna::Push(L, has_item);
++        return 1;
++    }
++
++    int RemoveItem(lua_State* L, Loot* loot)
++    {
++        uint32 itemid = Eluna::CHECKVAL<uint32>(L, 2);
++        bool isCountSpecified = Eluna::CHECKVAL<uint32>(L, 3, false);
++        uint32 count = isCountSpecified ? Eluna::CHECKVAL<uint32>(L, 4) : 0;
++
++        for (auto it = loot->items.begin(); it != loot->items.end();)
++        {
++            if (it->itemid == itemid)
++            {
++                if (isCountSpecified)
++                {
++                    if (it->count > count)
++                    {
++                        it->count -= count;
++                        break;
++                    }
++                    else
++                    {
++                        count -= it->count;
++                    }
++                }
++
++                it = loot->items.erase(it);
++            }
++            else
++            {
++                ++it;
++            }
++        }
++
++        return 0;
++    }
++
++    int GetMoney(lua_State* L, Loot* loot)
++    {
++        Eluna::Push(L, loot->gold);
++        return 1;
++    }
++
++    int SetMoney(lua_State* L, Loot* loot)
++    {
++        uint32 money = Eluna::CHECKVAL<uint32>(L, 2);
++
++        loot->gold = money;
++        return 0;
++    }
++
++    int GenerateMoney(lua_State* L, Loot* loot)
++    {
++        uint32 min = Eluna::CHECKVAL<uint32>(L, 2);
++        uint32 max = Eluna::CHECKVAL<uint32>(L, 3);
++
++        loot->generateMoneyLoot(min, max);
++        return 0;
++    }
++
++    int Clear(lua_State* /*L*/, Loot* loot)
++    {
++        loot->clear();
++        return 0;
++    }
++
++    int SetUnlootedCount(lua_State* L, Loot* loot)
++    {
++        uint32 count = Eluna::CHECKVAL<uint32>(L, 2);
++
++        loot->unlootedCount = count;
++        return 0;
++    }
++
++    int GetUnlootedCount(lua_State* L, Loot* loot)
++    {
++        Eluna::Push(L, loot->unlootedCount);
++        return 0;
++    }
++
++    int GetItems(lua_State* L, Loot* loot)
++    {
++        lua_createtable(L, loot->items.size(), 0);
++        int tbl = lua_gettop(L);
++
++        for (unsigned int i = 0; i < loot->items.size(); i++)
++        {
++            lua_newtable(L);
++
++            Eluna::Push(L, loot->items[i].itemid);
++            lua_setfield(L, -2, "id");
++
++            Eluna::Push(L, loot->items[i].itemIndex);
++            lua_setfield(L, -2, "index");
++
++            Eluna::Push(L, loot->items[i].count);
++            lua_setfield(L, -2, "count");
++
++            Eluna::Push(L, loot->items[i].needs_quest);
++            lua_setfield(L, -2, "needs_quest");
++
++            Eluna::Push(L, loot->items[i].is_looted);
++            lua_setfield(L, -2, "is_looted");
++
++            lua_rawseti(L, tbl, i + 1);
++        }
++
++        lua_settop(L, tbl);
++        return 1;
++    }
++
++    int UpdateItemIndex(lua_State* /*L*/, Loot* loot)
++    {
++        for (unsigned int i = 0; i < loot->items.size(); i++)
++            loot->items[i].itemIndex = i;
++
++        return 0;
++    }
++
++    int SetItemLooted(lua_State* L, Loot* loot)
++    {
++        uint32 itemid = Eluna::CHECKVAL<uint32>(L, 2);
++        uint32 count = Eluna::CHECKVAL<uint32>(L, 3);
++        bool looted = Eluna::CHECKVAL<uint32>(L, 4, true);
++
++        for (auto &lootItem : loot->items)
++        {
++            if (lootItem.itemid == itemid && (count == 0 || lootItem.count == count))
++            {
++                lootItem.is_looted = looted;
++                break;
++            }
++        }
++
++        return 0;
++    }
++}
++#endif
+diff --git a/src/LuaEngine/LuaEngine.h b/src/LuaEngine/LuaEngine.h
+index af0a5d5..861c905 100644
+--- a/src/LuaEngine/LuaEngine.h
++++ b/src/LuaEngine/LuaEngine.h
+@@ -1,3 +1,4 @@
++
+ /*
+ * Copyright (C) 2010 - 2016 Eluna Lua Engine <http://emudevs.com/>
+ * This program is free software licensed under GPL version 3
+@@ -24,6 +25,7 @@
+ #include "ElunaUtility.h"
+ #include "HttpManager.h"
+ #include "EventEmitter.h"
++#include "LootMgr.h"
+ #include <mutex>
+ #include <memory>
+ 
+diff --git a/src/LuaEngine/LuaFunctions.cpp b/src/LuaEngine/LuaFunctions.cpp
+index a4c75b0..699b146 100644
+--- a/src/LuaEngine/LuaFunctions.cpp
++++ b/src/LuaEngine/LuaFunctions.cpp
+@@ -40,6 +40,7 @@ extern "C"
+ #include "AchievementMethods.h"
+ #include "ItemTemplateMethods.h"
+ #include "RollMethods.h"
++#include "LootMethods.h"
+ 
+ luaL_Reg GlobalMethods[] =
+ {
+@@ -844,6 +845,7 @@ ElunaRegister<Creature> CreatureMethods[] =
+ #endif
+     { "GetDBTableGUIDLow", &LuaCreature::GetDBTableGUIDLow },
+     { "GetCreatureFamily", &LuaCreature::GetCreatureFamily },
++    { "GetLoot", &LuaCreature::GetLoot },
+ 
+     // Setters
+ #if defined(TRINITY) || defined(AZEROTHCORE)
+@@ -1416,6 +1418,30 @@ ElunaRegister<Roll> RollMethods[] =
+     { NULL, NULL }
+ };
+ 
++
++ElunaRegister<Loot> LootMethods[] =
++{
++    // Get
++    {"GetMoney", &LuaLoot::GetMoney},
++    {"GetItems", &LuaLoot::GetItems},
++    {"GetUnlootedCount", &LuaLoot::GetUnlootedCount},
++
++    // Set
++    {"AddItem", &LuaLoot::AddItem},
++    {"RemoveItem", &LuaLoot::RemoveItem},
++    {"SetMoney", &LuaLoot::SetMoney},
++    {"SetUnlootedCount", &LuaLoot::SetUnlootedCount},
++    {"UpdateItemIndex", &LuaLoot::UpdateItemIndex},
++    {"SetItemLooted", &LuaLoot::SetItemLooted},
++
++    // Boolean
++    {"IsLooted", &LuaLoot::IsLooted},
++    {"HasItem", &LuaLoot::HasItem},
++    {"Clear", &LuaLoot::Clear},
++
++    {NULL, NULL}
++};
++
+ #if (!defined(TBC) && !defined(CLASSIC))
+ // fix compile error about accessing vehicle destructor
+ template<> int ElunaTemplate<Vehicle>::CollectGarbage(lua_State* L)
