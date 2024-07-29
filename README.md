@@ -2,6 +2,9 @@
 ## Overview
 This script implements the highly sought-after AOE Loot/Mass Loot feature from Mist of Pandaria, allowing players to loot multiple corpses in a single action instead of looting each one individually.<br>It is compatible with any emulator that uses Eluna, including TrinityCore (Eluna) and AzerothCore (mod-eluna).
 
+## Preview
+[https://streamable.com/pvqigh](https://streamable.com/pvqigh)
+
 ## Features
 ### Functional
 - ✅ AOE Loot in Solo Play
