@@ -35,7 +35,7 @@ Works with any emulator using Eluna, with the provided `.diff` script ensuring f
 
 ## 📚 References
 
-- [AOE Looting in Mist of Pandaria](https://github.com/iThorgrim/lua_aoe_loot)
+- [AOE Looting in Mist of Pandaria](https://wowwiki-archive.fandom.com/wiki/Area_of_Effect_looting)
 
 ## 🛠️ Contribution
 
