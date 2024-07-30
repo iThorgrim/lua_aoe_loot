@@ -9,6 +9,7 @@ controller.OnLootFrameOpen = (event, packet, player) ->
 
         creature = selection\ToCreature!
         return nil unless creature
+        return nil unless creature:IsDead()
 
         lootable_creature = controller.GetLootableCreatures player
         controller.SetCreatureLoot player, creature, lootable_creature
