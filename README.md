@@ -7,11 +7,11 @@ Implement the AOE Loot/Mass Loot feature from Mist of Pandaria, allowing players
 
 ### Functionnal
 - ✅ AOE Loot in Solo Play
+- ✅ AOE Loot in Group Play
 - ✅ Duplication Protection
 
 ### Not Yet Functionnal
 - ❌ Enable/Disable via Interface
-- ❌ AOE Loot in Group Play
 
 ## 🚀 Installation
 
@@ -49,4 +49,4 @@ Licensed under GNU GPL v3. See the LICENSE file.
 ## 📝 Credits
 
 Readme generated with the help of ChatGPT.  
-Contributors: [@iThorgrim](https://github.com/iThorgrim), YourNameHere.
+Contributors: [@iThorgrim](https://github.com/iThorgrim), [@Niam5](https://github.com/Niam5), [@Intemporel](https://github.com/Intemporel)
