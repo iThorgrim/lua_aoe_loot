@@ -48,5 +48,5 @@ Licensed under GNU GPL v3. See the LICENSE file.
 
 ## 📝 Credits
 
-Generated with the help of ChatGPT.  
+Readme generated with the help of ChatGPT.  
 Contributors: [@iThorgrim](https://github.com/iThorgrim), YourNameHere.
