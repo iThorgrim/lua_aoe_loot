@@ -1,7 +1,7 @@
 controller = {}
 
 controller.OnLootFrameOpen = (event, packet, player) ->
-    aoe_loot_active = player\GetGroup! and false or true
+    aoe_loot_active = true
     if aoe_loot_active
         lootable_creature = controller.GetLootableCreatures player
         controller.SetCreatureLoot player, lootable_creature
@@ -23,7 +23,7 @@ controller.SetCreatureLoot = (player, creatures) ->
             unless creature_already_looted
                 items = loot\GetItems!
                 for _, loot_data in pairs items
-                    unless loot_data.is_looted
+                    if not loot_data.is_looted and (loot_data.roll_winner_guid == 0 or not loot_data.roll_winner_guid)
                         actual_loot\AddItem loot_data.id, loot_data.count, loot_data.count, 100.0, 0, loot_data.needs_quest
                 
                 actual_loot\SetMoney actual_loot\GetMoney! + loot\GetMoney!
