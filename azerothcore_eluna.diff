@@ -25,10 +25,10 @@ index f616399..fa8c9d0 100644
  #endif
 diff --git a/src/LuaEngine/LootMethods.h b/src/LuaEngine/LootMethods.h
 new file mode 100644
-index 0000000..15543d6
+index 0000000..0120d4e
 --- /dev/null
 +++ b/src/LuaEngine/LootMethods.h
-@@ -0,0 +1,211 @@
+@@ -0,0 +1,214 @@
 +/*
 +* Copyright (C) 2010 - 2024 Eluna Lua Engine <http://emudevs.com/>
 +* This program is free software licensed under GPL version 3
@@ -205,6 +205,9 @@ index 0000000..15543d6
 +
 +            Eluna::Push(L, loot->items[i].is_looted);
 +            lua_setfield(L, -2, "is_looted");
++
++            Eluna::Push(L, loot->items[i].rollWinnerGUID);
++            lua_setfield(L, -2, "roll_winner_guid");
 +
 +            lua_rawseti(L, tbl, i + 1);
 +        }
