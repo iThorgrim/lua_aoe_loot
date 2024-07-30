@@ -27,9 +27,13 @@ controller.SetCreatureLoot = (player, creatures) ->
                         actual_loot\AddItem loot_data.id, loot_data.count, loot_data.count, 100.0, 0, loot_data.needs_quest
                 
                 actual_loot\SetMoney actual_loot\GetMoney! + loot\GetMoney!
-                loot\Clear!
-                loot\SetUnlootedCount 0
+                if #items == 0
+                    loot\Clear!
+                    loot\SetUnlootedCount 0
+                    creature\RemoveFlag 0x0006 + 0x0049, 0x0001
+                else
+                    loot\SetUnlootedCount #items
+
                 loot\SetMoney 0
-                creature\RemoveFlag 0x0006 + 0x0049, 0x0001
 
     actual_loot\SetUnlootedCount #actual_loot\GetItems!
