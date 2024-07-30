@@ -49,4 +49,4 @@ Licensed under GNU GPL v3. See the LICENSE file.
 ## 📝 Credits
 
 Readme generated with the help of ChatGPT.  
-Contributors: [@iThorgrim](https://github.com/iThorgrim), YourNameHere.
+Contributors: [@iThorgrim](https://github.com/iThorgrim), [@Niam5](https://github.com/Niam5), [@Intemporel](https://github.com/Intemporel)
