@@ -2,8 +2,19 @@ local controller = { }
 controller.OnLootFrameOpen = function(event, packet, player)
   local aoe_loot_active = true
   if aoe_loot_active then
+    local selection = player:GetSelection()
+    if not (selection) then
+      return nil
+    end
+    if not (selection:GetTypeId() == 3) then
+      return nil
+    end
+    local creature = selection:ToCreature()
+    if not (creature) then
+      return nil
+    end
     local lootable_creature = controller.GetLootableCreatures(player)
-    return controller.SetCreatureLoot(player, lootable_creature)
+    return controller.SetCreatureLoot(player, creature, lootable_creature)
   end
 end
 RegisterPacketEvent(0x15D, 5, controller.OnLootFrameOpen)
@@ -24,25 +35,31 @@ controller.GetLootableCreatures = function(player)
   end
   return lootable_creatures
 end
-controller.SetCreatureLoot = function(player, creatures)
-  local actual_creature = player:GetSelection():ToCreature()
-  local actual_loot = actual_creature:GetLoot()
-  for _, creature in pairs(creatures) do
-    if creature ~= actual_creature and creature:GetLootRecipient() == player then
-      local loot = creature:GetLoot()
+controller.SetCreatureLoot = function(player, creature, lootable_creatures)
+  local actual_loot = creature:GetLoot()
+  local nbr_loot = #actual_loot:GetItems()
+  local loot_mode = creature:GetLootMode()
+  for _, corpse in pairs(lootable_creatures) do
+    if corpse ~= creature and corpse:GetLootRecipient() == player then
+      local loot = corpse:GetLoot()
       local creature_already_looted = loot:IsLooted()
       if not (creature_already_looted) then
-        local items = loot:GetItems()
-        for _, loot_data in pairs(items) do
-          if not loot_data.is_looted and (loot_data.roll_winner_guid == 0 or not loot_data.roll_winner_guid) then
-            actual_loot:AddItem(loot_data.id, loot_data.count, loot_data.count, 100.0, 0, loot_data.needs_quest)
+        for _, loot_data in pairs(loot:GetItems()) do
+          if (not loot_data.is_looted) and (GetGUIDLow(loot_data.roll_winner_guid) == 0) then
+            if not (actual_loot:HasItem(loot_data.id)) then
+              nbr_loot = nbr_loot + 1
+            end
+            loot:RemoveItem(loot_data.id)
+            actual_loot:AddItem(loot_data.id, 100.0, loot_data.needs_quest, loot_mode, 0, loot_data.count, loot_data.count)
+            actual_loot:UpdateItemIndex()
           end
         end
         actual_loot:SetMoney(actual_loot:GetMoney() + loot:GetMoney())
+        local items = loot:GetItems()
         if #items == 0 then
           loot:Clear()
           loot:SetUnlootedCount(0)
-          creature:RemoveFlag(0x0006 + 0x0049, 0x0001)
+          corpse:RemoveFlag(0x0006 + 0x0049, 0x0001)
         else
           loot:SetUnlootedCount(#items)
         end
@@ -50,5 +67,5 @@ controller.SetCreatureLoot = function(player, creatures)
       end
     end
   end
-  return actual_loot:SetUnlootedCount(#actual_loot:GetItems())
+  return actual_loot:SetUnlootedCount(nbr_loot)
 end
