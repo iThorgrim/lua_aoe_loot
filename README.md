@@ -7,11 +7,11 @@ Implement the AOE Loot/Mass Loot feature from Mist of Pandaria, allowing players
 
 ### Functionnal
 - ✅ AOE Loot in Solo Play
+- ✅ AOE Loot in Group Play
 - ✅ Duplication Protection
 
 ### Not Yet Functionnal
 - ❌ Enable/Disable via Interface
-- ❌ AOE Loot in Group Play
 
 ## 🚀 Installation
 
