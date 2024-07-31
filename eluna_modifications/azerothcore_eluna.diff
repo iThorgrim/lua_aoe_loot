@@ -25,10 +25,10 @@ index f616399..fa8c9d0 100644
  #endif
 diff --git a/src/LuaEngine/LootMethods.h b/src/LuaEngine/LootMethods.h
 new file mode 100644
-index 0000000..0120d4e
+index 0000000..3d4df37
 --- /dev/null
 +++ b/src/LuaEngine/LootMethods.h
-@@ -0,0 +1,214 @@
+@@ -0,0 +1,219 @@
 +/*
 +* Copyright (C) 2010 - 2024 Eluna Lua Engine <http://emudevs.com/>
 +* This program is free software licensed under GPL version 3
@@ -49,27 +49,32 @@ index 0000000..0120d4e
 +        return 1;
 +    }
 +
-+    int AddItem(lua_State* L, Loot* loot)
++    int AddItem(lua_State* L, Loot* loot) 
 +    {
 +        uint32 itemid = Eluna::CHECKVAL<uint32>(L, 2);
-+        uint8 min_count = Eluna::CHECKVAL<uint8>(L, 3);
-+        uint8 max_count = Eluna::CHECKVAL<uint8>(L, 4);
-+        float chance = Eluna::CHECKVAL<float>(L, 5);
-+        uint16 loot_mode = Eluna::CHECKVAL<uint16>(L, 6);
-+        bool needs_quest = Eluna::CHECKVAL<bool>(L, 7, false);
 +
-+        for (LootItem &lootitem : loot->items)
++        float chance = Eluna::CHECKVAL<float>(L, 3);
++        bool needs_quest = Eluna::CHECKVAL<bool>(L, 4, false);
++
++        uint16 loot_mode = Eluna::CHECKVAL<uint16>(L, 5);
++        uint8 groupid = Eluna::CHECKVAL<uint8>(L, 6);
++
++        uint8 min_count = Eluna::CHECKVAL<uint8>(L, 7);
++        uint8 max_count = Eluna::CHECKVAL<uint8>(L, 8);
++
++
++        for (LootItem &lootitem : loot->items) 
 +        {
-+            if (lootitem.itemid == itemid && lootitem.count < 255)
++            if (lootitem.itemid == itemid && lootitem.count < 255) 
 +            {
 +                lootitem.count += min_count; // Todo: Update to get rand between min_count and max_count
 +                return 0;
 +            }
 +        }
 +
-+        LootStoreItem newLootStoreItem(itemid, 0, chance, needs_quest, loot_mode, 0, min_count, max_count);
++        LootStoreItem newLootStoreItem(itemid, 0, chance, needs_quest, loot_mode, groupid, min_count, max_count);
 +        loot->AddItem(newLootStoreItem);
-+
++        
 +        return 0;
 +    }
 +
@@ -261,7 +266,7 @@ index af0a5d5..861c905 100644
  #include <memory>
  
 diff --git a/src/LuaEngine/LuaFunctions.cpp b/src/LuaEngine/LuaFunctions.cpp
-index a4c75b0..699b146 100644
+index a4c75b0..1dd3f9e 100644
 --- a/src/LuaEngine/LuaFunctions.cpp
 +++ b/src/LuaEngine/LuaFunctions.cpp
 @@ -40,6 +40,7 @@ extern "C"
@@ -311,3 +316,13 @@ index a4c75b0..699b146 100644
  #if (!defined(TBC) && !defined(CLASSIC))
  // fix compile error about accessing vehicle destructor
  template<> int ElunaTemplate<Vehicle>::CollectGarbage(lua_State* L)
+@@ -1567,6 +1593,9 @@ void RegisterFunctions(Eluna* E)
+     ElunaTemplate<Roll>::Register(E, "Roll");
+     ElunaTemplate<Roll>::SetMethods(E, RollMethods);
+ 
++    ElunaTemplate<Loot>::Register(E, "Loot");
++    ElunaTemplate<Loot>::SetMethods(E, LootMethods);
++
+     ElunaTemplate<long long>::Register(E, "long long", true);
+ 
+     ElunaTemplate<unsigned long long>::Register(E, "unsigned long long", true);
