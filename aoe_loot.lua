@@ -1,6 +1,6 @@
 local controller = { }
 controller.OnLootFrameOpen = function(event, packet, player)
-  local aoe_loot_active = true
+  local aoe_loot_active = player:GetData("AOE_LOOT_STATUS") or false
   if aoe_loot_active then
     local selection = player:GetSelection()
     if not (selection) then
@@ -11,6 +11,9 @@ controller.OnLootFrameOpen = function(event, packet, player)
     end
     local creature = selection:ToCreature()
     if not (creature) then
+      return nil
+    end
+    if not (creature:IsDead()) then
       return nil
     end
     local lootable_creature = controller.GetLootableCreatures(player)
