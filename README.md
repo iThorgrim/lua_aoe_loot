@@ -44,6 +44,7 @@ Works with any emulator using Eluna, with the provided `.diff` script ensuring f
 
 1. **Fork**, **Clone**, **Create a branch**, **Commit**, **Push**, **Create a PR**.
 2. Report issues in the issue tracker.
+3. You can [sponsor](https://github.com/sponsors/ithorgrim) my work!
 
 ## 📜 License
 
