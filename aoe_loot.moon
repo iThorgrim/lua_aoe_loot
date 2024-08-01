@@ -1,7 +1,7 @@
 controller = {}
 
 controller.OnLootFrameOpen = (event, packet, player) ->
-    aoe_loot_active = true
+    aoe_loot_active = player\GetData("AOE_LOOT_STATUS") or false
     if aoe_loot_active
         selection = player\GetSelection!
         return nil unless selection
