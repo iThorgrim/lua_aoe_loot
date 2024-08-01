@@ -11,6 +11,7 @@ Implement the AOE Loot/Mass Loot feature from Mist of Pandaria, allowing players
 - ✅ Duplication Protection
 - ✅ Enable/Disable via Interface (CSMH and AIO support)
 - ✅ ["Skinning"](https://wowpedia.fandom.com/wiki/Skinning) and ["Mob Engineering"](https://wowwiki-archive.fandom.com/wiki/Mob_engineering) support
+- ✅ Autoloot support (you can activate or disable it the AOELoot works !)
 
 ### Not Yet Functionnal
 - ❌ The futur
