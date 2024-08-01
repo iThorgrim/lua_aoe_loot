@@ -1,7 +1,7 @@
 controller = {}
 
 controller.OnLootFrameOpen = (event, packet, player) ->
-    aoe_loot_active = true
+    aoe_loot_active = player\GetData("AOE_LOOT_STATUS") or false
     if aoe_loot_active
         selection = player\GetSelection!
         return nil unless selection
@@ -9,6 +9,7 @@ controller.OnLootFrameOpen = (event, packet, player) ->
 
         creature = selection\ToCreature!
         return nil unless creature
+        return nil unless creature\IsDead!
 
         lootable_creature = controller.GetLootableCreatures player
         controller.SetCreatureLoot player, creature, lootable_creature
