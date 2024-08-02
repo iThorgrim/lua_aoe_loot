@@ -42,6 +42,7 @@ controller.SetCreatureLoot = (player, creature, lootable_creatures) ->
                 if #items == 0
                     loot\Clear!
                     loot\SetUnlootedCount 0
+                    corpse\AllLootRemoved!
                     corpse\RemoveFlag 0x0006 + 0x0049, 0x0001
                 else
                     loot\SetUnlootedCount #items

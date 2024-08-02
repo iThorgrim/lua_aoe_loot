@@ -1,17 +1,17 @@
 diff --git a/src/LuaEngine/CreatureMethods.h b/src/LuaEngine/CreatureMethods.h
-index f616399..fa8c9d0 100644
+index f616399..8af8b7d 100644
 --- a/src/LuaEngine/CreatureMethods.h
 +++ b/src/LuaEngine/CreatureMethods.h
 @@ -1017,7 +1017,7 @@ auto const& threatlist = creature->GetThreatMgr().GetThreatList();
          creature->SetUInt32Value(UNIT_NPC_FLAGS, flags);
          return 0;
      }
--    
+-
 +
      /**
       * Sets the [Creature]'s Unit flags to `flags`.
       *
-@@ -1538,5 +1538,11 @@ auto const& threatlist = creature->GetThreatMgr().GetThreatList();
+@@ -1538,5 +1538,17 @@ auto const& threatlist = creature->GetThreatMgr().GetThreatList();
  #endif
          return 1;
      }
@@ -20,6 +20,12 @@ index f616399..fa8c9d0 100644
 +    {
 +        Eluna::Push(L, &creature->loot);
 +        return 1;
++    }
++
++    int AllLootRemoved(lua_State* /*L*/, Creature* creature)
++    {
++        creature->AllLootRemovedFromCorpse();
++        return 0;
 +    }
  };
  #endif
@@ -49,7 +55,7 @@ index 0000000..3d4df37
 +        return 1;
 +    }
 +
-+    int AddItem(lua_State* L, Loot* loot) 
++    int AddItem(lua_State* L, Loot* loot)
 +    {
 +        uint32 itemid = Eluna::CHECKVAL<uint32>(L, 2);
 +
@@ -63,9 +69,9 @@ index 0000000..3d4df37
 +        uint8 max_count = Eluna::CHECKVAL<uint8>(L, 8);
 +
 +
-+        for (LootItem &lootitem : loot->items) 
++        for (LootItem &lootitem : loot->items)
 +        {
-+            if (lootitem.itemid == itemid && lootitem.count < 255) 
++            if (lootitem.itemid == itemid && lootitem.count < 255)
 +            {
 +                lootitem.count += min_count; // Todo: Update to get rand between min_count and max_count
 +                return 0;
@@ -74,7 +80,7 @@ index 0000000..3d4df37
 +
 +        LootStoreItem newLootStoreItem(itemid, 0, chance, needs_quest, loot_mode, groupid, min_count, max_count);
 +        loot->AddItem(newLootStoreItem);
-+        
++
 +        return 0;
 +    }
 +
@@ -264,9 +270,9 @@ index af0a5d5..861c905 100644
 +#include "LootMgr.h"
  #include <mutex>
  #include <memory>
- 
+
 diff --git a/src/LuaEngine/LuaFunctions.cpp b/src/LuaEngine/LuaFunctions.cpp
-index a4c75b0..1dd3f9e 100644
+index a4c75b0..5ef8904 100644
 --- a/src/LuaEngine/LuaFunctions.cpp
 +++ b/src/LuaEngine/LuaFunctions.cpp
 @@ -40,6 +40,7 @@ extern "C"
@@ -274,21 +280,22 @@ index a4c75b0..1dd3f9e 100644
  #include "ItemTemplateMethods.h"
  #include "RollMethods.h"
 +#include "LootMethods.h"
- 
+
  luaL_Reg GlobalMethods[] =
  {
-@@ -844,6 +845,7 @@ ElunaRegister<Creature> CreatureMethods[] =
+@@ -844,6 +845,8 @@ ElunaRegister<Creature> CreatureMethods[] =
  #endif
      { "GetDBTableGUIDLow", &LuaCreature::GetDBTableGUIDLow },
      { "GetCreatureFamily", &LuaCreature::GetCreatureFamily },
 +    { "GetLoot", &LuaCreature::GetLoot },
- 
++    { "AllLootRemoved", &LuaCreature::AllLootRemoved },
+
      // Setters
  #if defined(TRINITY) || defined(AZEROTHCORE)
-@@ -1416,6 +1418,30 @@ ElunaRegister<Roll> RollMethods[] =
+@@ -1416,6 +1419,30 @@ ElunaRegister<Roll> RollMethods[] =
      { NULL, NULL }
  };
- 
+
 +
 +ElunaRegister<Loot> LootMethods[] =
 +{
@@ -316,13 +323,13 @@ index a4c75b0..1dd3f9e 100644
  #if (!defined(TBC) && !defined(CLASSIC))
  // fix compile error about accessing vehicle destructor
  template<> int ElunaTemplate<Vehicle>::CollectGarbage(lua_State* L)
-@@ -1567,6 +1593,9 @@ void RegisterFunctions(Eluna* E)
+@@ -1567,6 +1594,9 @@ void RegisterFunctions(Eluna* E)
      ElunaTemplate<Roll>::Register(E, "Roll");
      ElunaTemplate<Roll>::SetMethods(E, RollMethods);
- 
+
 +    ElunaTemplate<Loot>::Register(E, "Loot");
 +    ElunaTemplate<Loot>::SetMethods(E, LootMethods);
 +
      ElunaTemplate<long long>::Register(E, "long long", true);
- 
+
      ElunaTemplate<unsigned long long>::Register(E, "unsigned long long", true);
