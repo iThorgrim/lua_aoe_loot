@@ -64,16 +64,6 @@ AOELoot.ProcessLootTransfer = (player, target, creature) ->
     creature_loot = creature\GetLoot!
     return unless target_loot or creature_loot
 
-<<<<<<< Updated upstream
-                actual_loot\SetMoney actual_loot\GetMoney! + loot\GetMoney!
-                items = loot\GetItems!
-                if #items == 0
-                    loot\Clear!
-                    loot\SetUnlootedCount 0
-                    corpse\RemoveFlag 0x0006 + 0x0049, 0x0001
-                else
-                    loot\SetUnlootedCount #items
-=======
     if creature_loot\IsLooted! or target_loot\IsLooted!
         return false
     
@@ -84,7 +74,6 @@ AOELoot.ProcessLootTransfer = (player, target, creature) ->
             target_loot_count += 1 unless target_loot\HasItem(loot_item.id)
             target_loot\AddItem loot_item.id, 100.0, loot_item.needs_quest, loot_mode, 0, loot_item.count, loot_item.count
             target_loot\UpdateItemIndex!
->>>>>>> Stashed changes
 
             creature_loot\RemoveItem loot_item.id
         AOELoot.ProcessClearCreature creature
