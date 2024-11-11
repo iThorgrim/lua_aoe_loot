@@ -1,5 +1,8 @@
 # 🗡️ AOE Loot Script for Eluna
 
+## It's now archived see this -> https://github.com/iThorgrim/lua_aoe_loot/issues/10
+
+
 ## Overview
 Implement the AOE Loot/Mass Loot feature from Mist of Pandaria, allowing players to loot multiple corpses in a single action. Compatible with any emulator using Eluna, including TrinityCore and AzerothCore.
 
